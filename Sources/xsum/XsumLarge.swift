@@ -6,15 +6,15 @@ struct XsumLarge: ~Copyable, Xsum {
     self.m_lacc = LargeAccumulator()
   }
 
-  mutating func add_list(vec: [Double]) {
+  mutating func addList(_ vec: [Double]) {
     for value in vec {
-      self.add(value: value)
+      self.add(value)
     }
   }
 
-  mutating func add(value: Double) {
+  mutating func add(_ value: Double) {
     // increment
-    self.m_lacc.m_sacc.increment_when_value_added(value: value)
+    self.m_lacc.m_sacc.incrementWhenValueAdded(value)
 
     // Convert to integer form in uintv
     let uintv: UInt64 = value.bitPattern
@@ -30,7 +30,7 @@ struct XsumLarge: ~Copyable, Xsum {
       // Inf/NaN chunk (in which case count will stay at -1), or one that
       // needs to be transferred to the small accumulator, or one that
       // has never been used before and needs to be initialized.
-      self.m_lacc.large_add_value_inf_nan(ix: ix, uintv: uintv)
+      self.m_lacc.largeAddValueInfNan(ix: ix, uintv: uintv)
     } else {
       // Store the decremented count of additions allowed before transfer,
       // and add this value to the chunk.
@@ -40,8 +40,8 @@ struct XsumLarge: ~Copyable, Xsum {
   }
 
   mutating func sum() -> Double {
-    self.m_lacc.transfer_to_small()
-    var xsum_smal = XsumSmall(small_accumulator: self.m_lacc.m_sacc)
+    self.m_lacc.transferToSmall()
+    var xsum_smal = XsumSmall(smallAccumulator: self.m_lacc.m_sacc)
     return xsum_smal.sum()
   }
 
@@ -49,9 +49,9 @@ struct XsumLarge: ~Copyable, Xsum {
     self = .init()
   }
 
-  static func from_xsum_small(xsmall: consuming XsumSmall) -> Self {
+  static func fromXsumSmall(xsmall: consuming XsumSmall) -> Self {
     var lacc = LargeAccumulator()
-    lacc.m_sacc = xsmall.transfer_accumulator()
+    lacc.m_sacc = xsmall.transferAccumulator()
     var newLarge = Self()
     newLarge.m_lacc = lacc
     return newLarge

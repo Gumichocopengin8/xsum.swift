@@ -1,27 +1,27 @@
 struct LargeAccumulator: ~Copyable {
     var m_chunk: [UInt64]  // Chunks making up large accumulator
     var m_count: [Int32]  // Counts of # adds remaining for chunks, or -1 if not used yet or special
-    var m_chunks_used: [UInt64]  // Bits indicate chunks in use
-    var m_used_used: UInt64  // Bits indicate chunk_used entries not 0
+    var m_chunksUsed: [UInt64]  // Bits indicate chunks in use
+    var m_usedUsed: UInt64  // Bits indicate chunk_used entries not 0
     var m_sacc: SmallAccumulator  // The small accumulator to condense into
 
     init() {
         self.m_chunk = Array(repeating: 0, count: XSUM_LCHUNKS)
         self.m_count = Array(repeating: -1, count: XSUM_LCHUNKS)
-        self.m_chunks_used = Array(repeating: 0, count: XSUM_LCHUNKS / 64)
-        self.m_used_used = 0
+        self.m_chunksUsed = Array(repeating: 0, count: XSUM_LCHUNKS / 64)
+        self.m_usedUsed = 0
         self.m_sacc = SmallAccumulator()
     }
 
-    mutating func add_lchunk_to_small(ix: Int) {
+    mutating func addLchunkToSmall(_ ix: Int) {
         let count: Int32 = self.m_count[ix]
 
         // Add to the small accumulator only if the count is not -1, which
         // indicates a chunk that contains nothing yet.
         if count >= 0 {
             // Propagate carries in the small accumulator if necessary.
-            if self.m_sacc.m_adds_until_propagate == 0 {
-                let _ = self.m_sacc.carry_propagate()
+            if self.m_sacc.m_addsUntilPropagate == 0 {
+                let _ = self.m_sacc.carryPropagate()
             }
 
             // Get the chunk we will add.  Note that this chunk is the integer sum
@@ -46,43 +46,43 @@ struct LargeAccumulator: ~Copyable {
             // exponent part is zero, the actual exponent is 1 (before subtracting
             // the bias), not zero.
             let exp: Int32 = Int32(ix) & Int32(XSUM_EXP_MASK)
-            var low_exp: Int32 = exp & Int32(XSUM_LOW_EXP_MASK)
-            var high_exp = Int(exp >> XSUM_LOW_EXP_BITS)
+            var lowExp: Int32 = exp & Int32(XSUM_LOW_EXP_MASK)
+            var highExp = Int(exp >> XSUM_LOW_EXP_BITS)
             if exp == 0 {
-                low_exp = 1
-                high_exp = 0
+                lowExp = 1
+                highExp = 0
             }
 
             // Split the mantissa into three parts, for three consecutive chunks in
             // the small accumulator.  Except for denormalized numbers, add in the sum
             // of all the implicit 1 bits that are above the actual mantissa bits.
-            let low_chunk: Int64 =
-                Int64(truncatingIfNeeded: chunk << low_exp) & XSUM_LOW_MANTISSA_MASK
-            var mid_chunk: Int64 = Int64(chunk) >> (XSUM_LOW_MANTISSA_BITS - Int64(low_exp))
+            let lowChunk: Int64 =
+                Int64(truncatingIfNeeded: chunk << lowExp) & XSUM_LOW_MANTISSA_MASK
+            var midChunk: Int64 = Int64(chunk) >> (XSUM_LOW_MANTISSA_BITS - Int64(lowExp))
             if exp != 0 {
                 // normalized
-                mid_chunk +=
+                midChunk +=
                     (Int64(1 << XSUM_LCOUNT_BITS) - Int64(count))
-                    << (XSUM_MANTISSA_BITS - XSUM_LOW_MANTISSA_BITS + Int64(low_exp))
+                    << (XSUM_MANTISSA_BITS - XSUM_LOW_MANTISSA_BITS + Int64(lowExp))
             }
-            let high_chunk = mid_chunk >> XSUM_LOW_MANTISSA_BITS
-            mid_chunk &= XSUM_LOW_MANTISSA_MASK
+            let highChunk = midChunk >> XSUM_LOW_MANTISSA_BITS
+            midChunk &= XSUM_LOW_MANTISSA_MASK
 
             // Add or subtract the three parts of the mantissa from three small
             // accumulator chunks, according to the sign that is part of the index.
             if ix & (1 << XSUM_EXP_BITS) != 0 {
-                self.m_sacc.m_chunk[high_exp] -= low_chunk
-                self.m_sacc.m_chunk[high_exp + 1] -= mid_chunk
-                self.m_sacc.m_chunk[high_exp + 2] -= high_chunk
+                self.m_sacc.m_chunk[highExp] -= lowChunk
+                self.m_sacc.m_chunk[highExp + 1] -= midChunk
+                self.m_sacc.m_chunk[highExp + 2] -= highChunk
             } else {
-                self.m_sacc.m_chunk[high_exp] += low_chunk
-                self.m_sacc.m_chunk[high_exp + 1] += mid_chunk
-                self.m_sacc.m_chunk[high_exp + 2] += high_chunk
+                self.m_sacc.m_chunk[highExp] += lowChunk
+                self.m_sacc.m_chunk[highExp + 1] += midChunk
+                self.m_sacc.m_chunk[highExp + 2] += highChunk
             }
 
             // The above additions/subtractions reduce by one the number we can
             // do before we need to do carry propagation again.
-            self.m_sacc.m_adds_until_propagate -= 1
+            self.m_sacc.m_addsUntilPropagate -= 1
         }
 
         // We now clear the chunk to zero, and set the count to the number
@@ -91,27 +91,27 @@ struct LargeAccumulator: ~Copyable {
         // (if that is enabled).
         self.m_chunk[ix] = 0
         self.m_count[ix] = 1 << XSUM_LCOUNT_BITS
-        self.m_chunks_used[ix >> 6] |= 1 << (ix & 0x3f)
-        self.m_used_used |= 1 << (ix >> 6)
+        self.m_chunksUsed[ix >> 6] |= 1 << (ix & 0x3f)
+        self.m_usedUsed |= 1 << (ix >> 6)
     }
 
-    mutating func large_add_value_inf_nan(ix: Int, uintv: UInt64) {
+    mutating func largeAddValueInfNan(ix: Int, uintv: UInt64) {
         if (Int64(ix) & XSUM_EXP_MASK) == XSUM_EXP_MASK {
-            self.m_sacc.add_inf_nan(ivalue: Int64(truncatingIfNeeded: uintv))
+            self.m_sacc.addInfNan(ivalue: Int64(truncatingIfNeeded: uintv))
         } else {
-            self.add_lchunk_to_small(ix: ix)
+            self.addLchunkToSmall(ix)
             self.m_count[ix] -= 1
             self.m_chunk[ix] += uintv
         }
     }
 
-    mutating func transfer_to_small() {
-        let chunks_used_size = self.m_chunks_used.count
+    mutating func transferToSmall() {
+        let chunksUsedSize = self.m_chunksUsed.count
         var p: Int = 0
 
         // Very quickly skip some unused low-order blocks of chunks by looking
         // at the m_usedUsed flags.
-        var uu = self.m_used_used
+        var uu = self.m_usedUsed
         if (uu & 0xffff_ffff) == 0 {
             uu >>= 32
             p += 32
@@ -130,36 +130,36 @@ struct LargeAccumulator: ~Copyable {
             // Loop to quickly find the next non-zero block of used flags,
             // or finish up if we've added all the used blocks to the small accumulator.
             while true {
-                u = self.m_chunks_used[p]
+                u = self.m_chunksUsed[p]
                 if u != 0 {
                     break
                 }
                 p += 1
-                if p == chunks_used_size {
+                if p == chunksUsedSize {
                     return
                 }
-                u = self.m_chunks_used[p]
+                u = self.m_chunksUsed[p]
                 if u != 0 {
                     break
                 }
                 p += 1
-                if p == chunks_used_size {
+                if p == chunksUsedSize {
                     return
                 }
-                u = self.m_chunks_used[p]
+                u = self.m_chunksUsed[p]
                 if u != 0 {
                     break
                 }
                 p += 1
-                if p == chunks_used_size {
+                if p == chunksUsedSize {
                     return
                 }
-                u = self.m_chunks_used[p]
+                u = self.m_chunksUsed[p]
                 if u != 0 {
                     break
                 }
                 p += 1
-                if p == chunks_used_size {
+                if p == chunksUsedSize {
                     return
                 }
             }
@@ -183,7 +183,7 @@ struct LargeAccumulator: ~Copyable {
 
             while true {
                 if self.m_count[ix] >= 0 {
-                    self.add_lchunk_to_small(ix: ix)
+                    self.addLchunkToSmall(ix)
                 }
                 ix += 1
                 u >>= 1
@@ -192,7 +192,7 @@ struct LargeAccumulator: ~Copyable {
                 }
             }
             p += 1
-            if p >= chunks_used_size {
+            if p >= chunksUsedSize {
                 break
             }
         }

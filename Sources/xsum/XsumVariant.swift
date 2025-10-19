@@ -15,49 +15,49 @@ enum XsumVariant: ~Copyable, Xsum {
     self = .small(XsumSmall())
   }
 
-  mutating func add_list(vec: [Double]) {
+  mutating func addList(_ vec: [Double]) {
     switch self {
-    case .small(var xsum_small):
-      xsum_small.add_list(vec: vec)
-      self = .small(xsum_small)
-    case .large(var xsum_large):
-      xsum_large.add_list(vec: vec)
-      self = .large(xsum_large)
+    case .small(var xsumSmall):
+      xsumSmall.addList(vec)
+      self = .small(xsumSmall)
+    case .large(var xsumLarge):
+      xsumLarge.addList(vec)
+      self = .large(xsumLarge)
     }
   }
 
-  mutating func add(value: Double) {
+  mutating func add(_ value: Double) {
     switch self {
-    case .small(var xsum_small):
-      xsum_small.add(value: value)
-      self = .small(xsum_small)
-    case .large(var xsum_large):
-      xsum_large.add(value: value)
-      self = .large(xsum_large)
+    case .small(var xsumSmall):
+      xsumSmall.add(value)
+      self = .small(xsumSmall)
+    case .large(var xsumLarge):
+      xsumLarge.add(value)
+      self = .large(xsumLarge)
     }
   }
 
   mutating func sum() -> Double {
     switch self {
-    case .small(var xsum_small):
-      let result = xsum_small.sum()
-      self = .small(xsum_small)
+    case .small(var xsumSmall):
+      let result = xsumSmall.sum()
+      self = .small(xsumSmall)
       return result
-    case .large(var xsum_large):
-      let result = xsum_large.sum()
-      self = .large(xsum_large)
+    case .large(var xsumLarge):
+      let result = xsumLarge.sum()
+      self = .large(xsumLarge)
       return result
     }
   }
 
   mutating func clear() {
     switch self {
-    case .small(var xsum_small):
-      xsum_small.clear()
-      self = .small(xsum_small)
-    case .large(var xsum_large):
-      xsum_large.clear()
-      self = .large(xsum_large)
+    case .small(var xsumSmall):
+      xsumSmall.clear()
+      self = .small(xsumSmall)
+    case .large(var xsumLarge):
+      xsumLarge.clear()
+      self = .large(xsumLarge)
     }
   }
 }

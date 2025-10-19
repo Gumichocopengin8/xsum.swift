@@ -1,43 +1,43 @@
 struct SmallAccumulator: ~Copyable {
   var m_chunk: [Int64]  // Chunks making up small accumulator
-  var m_adds_until_propagate: Int64  // Number of remaining adds before carry
+  var m_addsUntilPropagate: Int64  // Number of remaining adds before carry
   var m_inf: Int64  // If non-zero, +Inf, -Inf, or NaN
   var m_nan: Int64  // If non-zero, a NaN value with payload
-  var m_size_count: UInt64  // number of added values
-  var m_has_pos_number: Bool  // check if added values have at least one positive number
+  var m_sizeCount: UInt64  // number of added values
+  var m_hasPosNumber: Bool  // check if added values have at least one positive number
 
   init() {
     self.m_chunk = Array(repeating: 0, count: XSUM_SCHUNKS)
-    self.m_adds_until_propagate = XSUM_SMALL_CARRY_TERMS
+    self.m_addsUntilPropagate = XSUM_SMALL_CARRY_TERMS
     self.m_inf = 0
     self.m_nan = 0
-    self.m_size_count = 0
-    self.m_has_pos_number = false
+    self.m_sizeCount = 0
+    self.m_hasPosNumber = false
   }
 
   init(
     chunk: [Int64],
-    adds_until_propagate: Int64,
+    addsUntilPropagate: Int64,
     inf: Int64,
     nan: Int64,
-    size_count: UInt64,
-    has_pos_number: Bool,
+    sizeCount: UInt64,
+    hasPosNumber: Bool,
   ) {
     self.m_chunk = chunk
-    self.m_adds_until_propagate = adds_until_propagate
+    self.m_addsUntilPropagate = addsUntilPropagate
     self.m_inf = inf
     self.m_nan = nan
-    self.m_size_count = size_count
-    self.m_has_pos_number = has_pos_number
+    self.m_sizeCount = sizeCount
+    self.m_hasPosNumber = hasPosNumber
   }
 
-  mutating func carry_propagate() -> Int {
+  mutating func carryPropagate() -> Int {
     // Set u to the index of the uppermost non-zero (for now) chunk, or
     // return with value 0 if there is none.
     var u: Int = XSUM_SCHUNKS - 1
     while 0 <= u && self.m_chunk[u] == 0 {
       if u == 0 {
-        self.m_adds_until_propagate = XSUM_SMALL_CARRY_TERMS - 1
+        self.m_addsUntilPropagate = XSUM_SMALL_CARRY_TERMS - 1
         return 0
       }
       u -= 1
@@ -103,7 +103,7 @@ struct SmallAccumulator: ~Copyable {
 
       self.m_chunk[i] = clow
       if i + 1 >= XSUM_SCHUNKS {
-        self.add_inf_nan(ivalue: (XSUM_EXP_MASK << XSUM_MANTISSA_BITS) | XSUM_MANTISSA_MASK)
+        self.addInfNan(ivalue: (XSUM_EXP_MASK << XSUM_MANTISSA_BITS) | XSUM_MANTISSA_MASK)
         u = i
       } else {
         self.m_chunk[(i + 1)] += chigh  // note: this could make this chunk be zero
@@ -120,7 +120,7 @@ struct SmallAccumulator: ~Copyable {
     // have created zero from something that initially looked non-zero.
     if uix < 0 {
       uix = 0
-      self.m_adds_until_propagate = XSUM_SMALL_CARRY_TERMS - 1
+      self.m_addsUntilPropagate = XSUM_SMALL_CARRY_TERMS - 1
       return uix
     }
 
@@ -135,11 +135,11 @@ struct SmallAccumulator: ~Copyable {
       uix -= 1
     }
 
-    self.m_adds_until_propagate = XSUM_SMALL_CARRY_TERMS - 1
+    self.m_addsUntilPropagate = XSUM_SMALL_CARRY_TERMS - 1
     return uix  // Return index of uppermost non-zero chunk
   }
 
-  mutating func add_inf_nan(ivalue: Int64) {
+  mutating func addInfNan(ivalue: Int64) {
     let mantissa: Int64 = ivalue & XSUM_MANTISSA_MASK
 
     if mantissa == 0 {
@@ -163,14 +163,14 @@ struct SmallAccumulator: ~Copyable {
     }
   }
 
-  mutating func add1_no_carry(value: Double) {
+  mutating func add1NoCarry(_ value: Double) {
     let ivalue = Int64(bitPattern: value.bitPattern)
 
     // Extract exponent and mantissa.  Split exponent into high and low parts.
     let exp: Int64 = (ivalue >> XSUM_MANTISSA_BITS) & XSUM_EXP_MASK
     var mantissa: Int64 = ivalue & XSUM_MANTISSA_MASK
-    let high_exp: Int = Int(exp >> XSUM_LOW_EXP_BITS)
-    var low_exp: Int64 = exp & XSUM_LOW_EXP_MASK
+    let highExp: Int = Int(exp >> XSUM_LOW_EXP_BITS)
+    var lowExp: Int64 = exp & XSUM_LOW_EXP_MASK
 
     // Categorize number as normal, denormalized, or Inf/NaN according to
     // the value of the exponent field.
@@ -181,11 +181,11 @@ struct SmallAccumulator: ~Copyable {
         return
       }
       // Denormalized mantissa has no implicit 1, but exponent is 1 not 0.
-      low_exp = 1
+      lowExp = 1
     } else if exp == XSUM_EXP_MASK {
       // Inf or NaN
       // Just update flags in accumulator structure.
-      self.add_inf_nan(ivalue: ivalue)
+      self.addInfNan(ivalue: ivalue)
       return
     } else {
       // normalized
@@ -201,21 +201,21 @@ struct SmallAccumulator: ~Copyable {
     // while high_mantissa will have at most XSUM_MANTISSA_BITS bits, since
     // even though the high mantissa includes the extra implicit 1 bit, it will
     // also be shifted right by at least one bit.
-    let split_mantissaFirst: Int64 = (mantissa << low_exp) & XSUM_LOW_MANTISSA_MASK
-    let split_mantissaSecond: Int64 = mantissa >> (XSUM_LOW_MANTISSA_BITS - low_exp)
+    let splitMantissaFirst: Int64 = (mantissa << lowExp) & XSUM_LOW_MANTISSA_MASK
+    let splitMantissaSecond: Int64 = mantissa >> (XSUM_LOW_MANTISSA_BITS - lowExp)
 
     // Add to, or subtract from, the two affected chunks.
     if ivalue < 0 {
-      self.m_chunk[high_exp] -= split_mantissaFirst
-      self.m_chunk[high_exp + 1] -= split_mantissaSecond
+      self.m_chunk[highExp] -= splitMantissaFirst
+      self.m_chunk[highExp + 1] -= splitMantissaSecond
     } else {
-      self.m_chunk[high_exp] += split_mantissaFirst
-      self.m_chunk[high_exp + 1] += split_mantissaSecond
+      self.m_chunk[highExp] += splitMantissaFirst
+      self.m_chunk[highExp + 1] += splitMantissaSecond
     }
   }
 
-  mutating func increment_when_value_added(value: Double) {
-    self.m_size_count += 1
-    self.m_has_pos_number = self.m_has_pos_number || value.sign == .plus
+  mutating func incrementWhenValueAdded(_ value: Double) {
+    self.m_sizeCount += 1
+    self.m_hasPosNumber = self.m_hasPosNumber || value.sign == .plus
   }
 }

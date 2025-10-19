@@ -16,12 +16,12 @@ import Testing
     func isSameValue(_ vec: [Double], _ expected: Double) {
         // XsumSmall
         var xsumSmall = XsumSmall()
-        xsumSmall.add_list(vec: vec)
+        xsumSmall.addList(vec)
         #expect(isValid(actual: xsumSmall.sum(), expected: expected))
 
         xsumSmall = XsumSmall()
         for val in vec {
-            xsumSmall.add(value: val)
+            xsumSmall.add(val)
         }
         #expect(isValid(actual: xsumSmall.sum(), expected: expected))
 
@@ -30,12 +30,12 @@ import Testing
 
         // XsumLarge
         var xsumLarge = XsumLarge()
-        xsumLarge.add_list(vec: vec)
+        xsumLarge.addList(vec)
         #expect(isValid(actual: xsumLarge.sum(), expected: expected))
 
         xsumLarge = XsumLarge()
         for val in vec {
-            xsumLarge.add(value: val)
+            xsumLarge.add(val)
         }
         #expect(isValid(actual: xsumLarge.sum(), expected: expected))
 
@@ -44,12 +44,12 @@ import Testing
 
         // XsumAuto
         var xsumAuto = XsumAuto()
-        xsumAuto.add_list(vec: vec)
+        xsumAuto.addList(vec)
         #expect(isValid(actual: xsumAuto.sum(), expected: expected))
 
         xsumAuto = XsumAuto()
         for val in vec {
-            xsumAuto.add(value: val)
+            xsumAuto.add(val)
         }
         #expect(isValid(actual: xsumAuto.sum(), expected: expected))
 
@@ -63,7 +63,7 @@ import Testing
             } else {
                 XsumVariant.small(XsumSmall())
             }
-        xsumVariant.add_list(vec: vec)
+        xsumVariant.addList(vec)
         #expect(isValid(actual: xsumVariant.sum(), expected: expected))
 
         xsumVariant =
@@ -73,7 +73,7 @@ import Testing
                 XsumVariant.small(XsumSmall())
             }
         for val in vec {
-            xsumVariant.add(value: val)
+            xsumVariant.add(val)
         }
         #expect(isValid(actual: xsumVariant.sum(), expected: expected))
 
@@ -268,7 +268,7 @@ import Testing
     }
 
     @Test
-    func nan_infinity() {
+    func nanInfinity() {
         isSameValue([Double.nan], Double.nan)
         isSameValue([Double.nan, 2.4], Double.nan)
         isSameValue([Double.infinity, Double.nan], Double.nan)

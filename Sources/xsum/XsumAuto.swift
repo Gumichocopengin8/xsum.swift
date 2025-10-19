@@ -19,34 +19,34 @@ struct XsumAuto: ~Copyable, Xsum {
     self.m_xsum = XsumKind.XSmall(XsumSmall())
   }
 
-  mutating func add_list(vec: [Double]) {
+  mutating func addList(_ vec: [Double]) {
     var old = XsumKind.Empty
     swap(&old, &self.m_xsum)
 
     switch old {
     case .XSmall(var xsmall):
-      xsmall.add_list(vec: vec)
+      xsmall.addList(vec)
       self.m_xsum = .XSmall(xsmall)
-      self.transform_to_large()
+      self.transformToLarge()
     case .XLarge(var xlarge):
-      xlarge.add_list(vec: vec)
+      xlarge.addList(vec)
       self.m_xsum = .XLarge(xlarge)
     case .Empty:
       fatalError("Empty case should never occur")
     }
   }
 
-  mutating func add(value: Double) {
+  mutating func add(_ value: Double) {
     var old = XsumKind.Empty
     swap(&old, &self.m_xsum)
 
     switch old {
     case .XSmall(var xsmall):
-      xsmall.add(value: value)
+      xsmall.add(value)
       self.m_xsum = .XSmall(xsmall)
-      self.transform_to_large()
+      self.transformToLarge()
     case .XLarge(var xlarge):
-      xlarge.add(value: value)
+      xlarge.add(value)
       self.m_xsum = .XLarge(xlarge)
     case .Empty:
       fatalError("Empty case should never occur")
@@ -75,11 +75,11 @@ struct XsumAuto: ~Copyable, Xsum {
     self = .init()
   }
 
-  mutating func transform_to_large() {
+  mutating func transformToLarge() {
     let should_transform =
       switch self.m_xsum {
       case .XSmall(let xsmall):
-        xsmall.get_size_count() > XSUM_THRESHOLD
+        xsmall.getSizeCount() > XSUM_THRESHOLD
       case .XLarge:
         false
       case .Empty:
@@ -94,7 +94,7 @@ struct XsumAuto: ~Copyable, Xsum {
     swap(&old_xsum, &self.m_xsum)
 
     if case .XSmall(let xsmall) = old_xsum {
-      self.m_xsum = .XLarge(XsumLarge.from_xsum_small(xsmall: xsmall))
+      self.m_xsum = .XLarge(XsumLarge.fromXsumSmall(xsmall: xsmall))
     }
   }
 }

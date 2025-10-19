@@ -6,49 +6,51 @@ struct XsumSmall: ~Copyable, Xsum {
     self.m_sacc = SmallAccumulator()
   }
 
-  init(small_accumulator: borrowing SmallAccumulator) {
+  init(smallAccumulator: borrowing SmallAccumulator) {
     self.m_sacc = SmallAccumulator(
-      chunk: small_accumulator.m_chunk,
-      adds_until_propagate: small_accumulator.m_adds_until_propagate, inf: small_accumulator.m_inf,
-      nan: small_accumulator.m_nan,
-      size_count: small_accumulator.m_size_count, has_pos_number: small_accumulator.m_has_pos_number
+      chunk: smallAccumulator.m_chunk,
+      addsUntilPropagate: smallAccumulator.m_addsUntilPropagate,
+      inf: smallAccumulator.m_inf,
+      nan: smallAccumulator.m_nan,
+      sizeCount: smallAccumulator.m_sizeCount,
+      hasPosNumber: smallAccumulator.m_hasPosNumber
     )
   }
 
-  func get_size_count() -> UInt64 {
-    self.m_sacc.m_size_count
+  func getSizeCount() -> UInt64 {
+    self.m_sacc.m_sizeCount
   }
 
-  consuming func transfer_accumulator() -> SmallAccumulator {
+  consuming func transferAccumulator() -> SmallAccumulator {
     self.m_sacc
   }
 
-  mutating func add_list(vec: [Double]) {
+  mutating func addList(_ vec: [Double]) {
     var offset = 0
     var n = vec.count
 
     while 0 < n {
-      if self.m_sacc.m_adds_until_propagate == 0 {
-        let _ = self.m_sacc.carry_propagate()
+      if self.m_sacc.m_addsUntilPropagate == 0 {
+        let _ = self.m_sacc.carryPropagate()
       }
-      let m = min(n, Int(self.m_sacc.m_adds_until_propagate))
+      let m = min(n, Int(self.m_sacc.m_addsUntilPropagate))
       for value in vec[offset..<offset + m] {
-        self.m_sacc.increment_when_value_added(value: value)
-        self.m_sacc.add1_no_carry(value: value)
+        self.m_sacc.incrementWhenValueAdded(value)
+        self.m_sacc.add1NoCarry(value)
       }
-      self.m_sacc.m_adds_until_propagate -= Int64(m)
+      self.m_sacc.m_addsUntilPropagate -= Int64(m)
       offset += m
       n -= m
     }
   }
 
-  mutating func add(value: Double) {
-    self.m_sacc.increment_when_value_added(value: value)
-    if self.m_sacc.m_adds_until_propagate == 0 {
-      let _ = self.m_sacc.carry_propagate()
+  mutating func add(_ value: Double) {
+    self.m_sacc.incrementWhenValueAdded(value)
+    if self.m_sacc.m_addsUntilPropagate == 0 {
+      let _ = self.m_sacc.carryPropagate()
     }
-    self.m_sacc.add1_no_carry(value: value)
-    self.m_sacc.m_adds_until_propagate -= 1
+    self.m_sacc.add1NoCarry(value)
+    self.m_sacc.m_addsUntilPropagate -= 1
   }
 
   mutating func sum() -> Double {
@@ -67,7 +69,7 @@ struct XsumSmall: ~Copyable, Xsum {
       return Double(bitPattern: UInt64(bitPattern: self.m_sacc.m_inf))
     }
 
-    if self.m_sacc.m_size_count == 0 {
+    if self.m_sacc.m_sizeCount == 0 {
       return -0.0
     }
 
@@ -81,7 +83,7 @@ struct XsumSmall: ~Copyable, Xsum {
     // m_sacc.chunk[i].  Note that ivalue will not be 0 or -1, unless
     // i is 0 (the lowest chunk), in which case it will be handled by
     // the code for denormalized numbers.
-    let i = self.m_sacc.carry_propagate()
+    let i = self.m_sacc.carryPropagate()
     var ivalue = self.m_sacc.m_chunk[i]
     var intv: Int64
 
@@ -89,7 +91,7 @@ struct XsumSmall: ~Copyable, Xsum {
     if i <= 1 {
       // Check for zero value, in which case we can return immediately.
       if ivalue == 0 {
-        return if !self.m_sacc.m_has_pos_number {
+        return if !self.m_sacc.m_hasPosNumber {
           -0.0
         } else {
           0.0
