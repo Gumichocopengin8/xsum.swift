@@ -69,3 +69,7 @@ var xVariant: XsumVariant =
 xVariant.addList(arr)
 assert(xVariant.sum() == 2_000.0)
 ```
+
+## Comformance
+
+xsum comforms to Javascript's [Math.sumPrecise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sumPrecise) behavior.
