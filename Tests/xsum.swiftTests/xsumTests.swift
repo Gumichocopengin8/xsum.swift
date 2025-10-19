@@ -19,10 +19,10 @@ import Testing
         xsumSmall.add_list(vec: vec)
         #expect(isValid(actual: xsumSmall.sum(), expected: expected))
 
-        // // XsumLarge
-        // var xsumLarge = XsumLarge()
-        // xsumLarge.addList(vec)
-        // #expect(isValid(actual: xsumLarge.sum(), expected: expected))
+        // XsumLarge
+        var xsumLarge = XsumLarge()
+        xsumLarge.add_list(vec: vec)
+        #expect(isValid(actual: xsumLarge.sum(), expected: expected))
 
         // // XsumAuto
         // var xsumAuto = XsumAuto()
