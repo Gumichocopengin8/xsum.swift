@@ -19,15 +19,42 @@ import Testing
         xsumSmall.add_list(vec: vec)
         #expect(isValid(actual: xsumSmall.sum(), expected: expected))
 
+        xsumSmall = XsumSmall()
+        for val in vec {
+            xsumSmall.add(value: val)
+        }
+        #expect(isValid(actual: xsumSmall.sum(), expected: expected))
+
+        xsumSmall.clear()
+        #expect(isValid(actual: xsumSmall.sum(), expected: -0.0))
+
         // XsumLarge
         var xsumLarge = XsumLarge()
         xsumLarge.add_list(vec: vec)
         #expect(isValid(actual: xsumLarge.sum(), expected: expected))
 
-        // // XsumAuto
-        // var xsumAuto = XsumAuto()
-        // xsumAuto.addList(vec)
-        // #expect(isValid(actual: xsumAuto.sum(), expected: expected))
+        xsumLarge = XsumLarge()
+        for val in vec {
+            xsumLarge.add(value: val)
+        }
+        #expect(isValid(actual: xsumLarge.sum(), expected: expected))
+
+        xsumLarge.clear()
+        #expect(isValid(actual: xsumLarge.sum(), expected: -0.0))
+
+        // XsumAuto
+        var xsumAuto = XsumAuto()
+        xsumAuto.add_list(vec: vec)
+        #expect(isValid(actual: xsumAuto.sum(), expected: expected))
+
+        xsumAuto = XsumAuto()
+        for val in vec {
+            xsumAuto.add(value: val)
+        }
+        #expect(isValid(actual: xsumAuto.sum(), expected: expected))
+
+        xsumAuto.clear()
+        #expect(isValid(actual: xsumAuto.sum(), expected: -0.0))
 
         // // XsumExt
         // #expect(isValid(actual: vec.xsum(), expected: expected))

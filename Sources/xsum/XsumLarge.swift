@@ -49,9 +49,11 @@ struct XsumLarge: ~Copyable, Xsum {
     self = .init()
   }
 
-  mutating func from_xsum_small(xsmall: consuming XsumSmall) {
+  static func from_xsum_small(xsmall: consuming XsumSmall) -> Self {
     var lacc = LargeAccumulator()
     lacc.m_sacc = xsmall.transfer_accumulator()
-    self.m_lacc = lacc
+    var newLarge = Self()
+    newLarge.m_lacc = lacc
+    return newLarge
   }
 }
