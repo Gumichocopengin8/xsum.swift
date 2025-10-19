@@ -1,5 +1,5 @@
 extension [Double] {
-  func xsum() -> Double {
+  public func xsum() -> Double {
     if self.count < XSUM_THRESHOLD {
       var xsumsmall = XsumSmall()
       xsumsmall.addList(self)

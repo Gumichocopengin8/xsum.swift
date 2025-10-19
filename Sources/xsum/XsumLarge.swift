@@ -1,5 +1,5 @@
 /// XsumLarge is efficient if vector or array size is more 1,000
-struct XsumLarge: ~Copyable, Xsum {
+public struct XsumLarge: ~Copyable, Xsum {
   var m_lacc: LargeAccumulator
 
   init() {

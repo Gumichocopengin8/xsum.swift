@@ -1,5 +1,5 @@
 /// XsumSmall is efficient if vector or array size is less than or equal to 1,000
-struct XsumSmall: ~Copyable, Xsum {
+public struct XsumSmall: ~Copyable, Xsum {
   var m_sacc: SmallAccumulator
 
   init() {

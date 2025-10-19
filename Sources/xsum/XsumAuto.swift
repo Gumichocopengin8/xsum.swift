@@ -12,7 +12,7 @@ enum XsumKind: ~Copyable {
 /// It automatically select either XsumSmall or XsumLarge based on the number of added value
 ///
 /// If the size if less than or equal to 1,000, use XsumSmall, otherwise, use XsumLarge
-struct XsumAuto: ~Copyable, Xsum {
+public struct XsumAuto: ~Copyable, Xsum {
   var m_xsum: XsumKind
 
   init() {

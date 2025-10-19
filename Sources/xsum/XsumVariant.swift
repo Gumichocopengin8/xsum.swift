@@ -7,7 +7,7 @@
 ///
 /// If you already know the input size in advance, you can directly select the
 /// most suitable xsum variant, avoiding unnecessary overhead.
-enum XsumVariant: ~Copyable, Xsum {
+public enum XsumVariant: ~Copyable, Xsum {
   case small(XsumSmall)
   case large(XsumLarge)
 
