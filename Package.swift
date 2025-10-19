@@ -4,23 +4,23 @@
 import PackageDescription
 
 let package = Package(
-    name: "xsum.swift",
+    name: "xsum",
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "xsum.swift",
-            targets: ["xsum.swift"]
+            name: "xsum",
+            targets: ["xsum"]
         ),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "xsum.swift"
+            name: "xsum"
         ),
         .testTarget(
-            name: "xsum.swiftTests",
-            dependencies: ["xsum.swift"]
+            name: "xsumTests",
+            dependencies: ["xsum"]
         ),
     ]
 )
