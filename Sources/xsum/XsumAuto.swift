@@ -2,9 +2,9 @@ enum XsumKind: ~Copyable {
   // TODO: https://forums.swift.org/t/how-do-you-switch-on-a-noncopyable-type/65136
   // As of swift v6.2, switch statement always consumes variable, so use `empty` case to avoid the issue
   // when switch can borrow variable in the future, get rid of it, and rewrite each method more concisely like xsum.rs
-  case Empty
-  case XSmall(XsumSmall)
-  case XLarge(XsumLarge)
+  case empty
+  case small(XsumSmall)
+  case large(XsumLarge)
 }
 
 /// XsumAuto is efficient if vector or array size is unknown
@@ -16,57 +16,57 @@ struct XsumAuto: ~Copyable, Xsum {
   var m_xsum: XsumKind
 
   init() {
-    self.m_xsum = XsumKind.XSmall(XsumSmall())
+    self.m_xsum = XsumKind.small(XsumSmall())
   }
 
   mutating func addList(_ vec: [Double]) {
-    var old = XsumKind.Empty
+    var old = XsumKind.empty
     swap(&old, &self.m_xsum)
 
     switch old {
-    case .XSmall(var xsmall):
+    case .small(var xsmall):
       xsmall.addList(vec)
-      self.m_xsum = .XSmall(xsmall)
+      self.m_xsum = .small(xsmall)
       self.transformToLarge()
-    case .XLarge(var xlarge):
+    case .large(var xlarge):
       xlarge.addList(vec)
-      self.m_xsum = .XLarge(xlarge)
-    case .Empty:
+      self.m_xsum = .large(xlarge)
+    case .empty:
       fatalError("Empty case should never occur")
     }
   }
 
   mutating func add(_ value: Double) {
-    var old = XsumKind.Empty
+    var old = XsumKind.empty
     swap(&old, &self.m_xsum)
 
     switch old {
-    case .XSmall(var xsmall):
+    case .small(var xsmall):
       xsmall.add(value)
-      self.m_xsum = .XSmall(xsmall)
+      self.m_xsum = .small(xsmall)
       self.transformToLarge()
-    case .XLarge(var xlarge):
+    case .large(var xlarge):
       xlarge.add(value)
-      self.m_xsum = .XLarge(xlarge)
-    case .Empty:
+      self.m_xsum = .large(xlarge)
+    case .empty:
       fatalError("Empty case should never occur")
     }
   }
 
   mutating func sum() -> Double {
-    var old = XsumKind.Empty
+    var old = XsumKind.empty
     swap(&old, &self.m_xsum)
 
     switch old {
-    case .XSmall(var xsmall):
+    case .small(var xsmall):
       let result = xsmall.sum()
-      self.m_xsum = .XSmall(xsmall)
+      self.m_xsum = .small(xsmall)
       return result
-    case .XLarge(var xlarge):
+    case .large(var xlarge):
       let result = xlarge.sum()
-      self.m_xsum = .XLarge(xlarge)
+      self.m_xsum = .large(xlarge)
       return result
-    case .Empty:
+    case .empty:
       fatalError("Empty case should never occur")
     }
   }
@@ -78,11 +78,11 @@ struct XsumAuto: ~Copyable, Xsum {
   mutating func transformToLarge() {
     let should_transform =
       switch self.m_xsum {
-      case .XSmall(let xsmall):
+      case .small(let xsmall):
         xsmall.getSizeCount() > XSUM_THRESHOLD
-      case .XLarge:
+      case .large:
         false
-      case .Empty:
+      case .empty:
         fatalError("Empty case should never occur")
       }
 
@@ -90,11 +90,11 @@ struct XsumAuto: ~Copyable, Xsum {
       return
     }
 
-    var old_xsum = XsumKind.Empty
+    var old_xsum = XsumKind.empty
     swap(&old_xsum, &self.m_xsum)
 
-    if case .XSmall(let xsmall) = old_xsum {
-      self.m_xsum = .XLarge(XsumLarge.fromXsumSmall(xsmall: xsmall))
+    if case .small(let xsmall) = old_xsum {
+      self.m_xsum = .large(XsumLarge.fromXsumSmall(xsmall: xsmall))
     }
   }
 }
