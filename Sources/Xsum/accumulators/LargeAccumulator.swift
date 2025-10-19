@@ -13,7 +13,7 @@ struct LargeAccumulator: ~Copyable {
         self.m_sacc = SmallAccumulator()
     }
 
-    mutating func addLchunkToSmall(_ ix: Int) {
+    private mutating func addLchunkToSmall(_ ix: Int) {
         let count: Int32 = self.m_count[ix]
 
         // Add to the small accumulator only if the count is not -1, which

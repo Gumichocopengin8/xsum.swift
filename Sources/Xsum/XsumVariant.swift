@@ -11,11 +11,11 @@ public enum XsumVariant: ~Copyable, Xsum {
   case small(XsumSmall)
   case large(XsumLarge)
 
-  init() {
+  public init() {
     self = .small(XsumSmall())
   }
 
-  mutating func addList(_ vec: [Double]) {
+  public mutating func addList(_ vec: [Double]) {
     switch self {
     case .small(var xsumSmall):
       xsumSmall.addList(vec)
@@ -26,7 +26,7 @@ public enum XsumVariant: ~Copyable, Xsum {
     }
   }
 
-  mutating func add(_ value: Double) {
+  public mutating func add(_ value: Double) {
     switch self {
     case .small(var xsumSmall):
       xsumSmall.add(value)
@@ -37,7 +37,7 @@ public enum XsumVariant: ~Copyable, Xsum {
     }
   }
 
-  mutating func sum() -> Double {
+  public mutating func sum() -> Double {
     switch self {
     case .small(var xsumSmall):
       let result = xsumSmall.sum()
@@ -50,7 +50,7 @@ public enum XsumVariant: ~Copyable, Xsum {
     }
   }
 
-  mutating func clear() {
+  public mutating func clear() {
     switch self {
     case .small(var xsumSmall):
       xsumSmall.clear()

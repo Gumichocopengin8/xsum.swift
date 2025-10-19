@@ -1,8 +1,8 @@
 /// XsumSmall is efficient if vector or array size is less than or equal to 1,000
 public struct XsumSmall: ~Copyable, Xsum {
-  var m_sacc: SmallAccumulator
+  private var m_sacc: SmallAccumulator
 
-  init() {
+  public init() {
     self.m_sacc = SmallAccumulator()
   }
 
@@ -25,7 +25,7 @@ public struct XsumSmall: ~Copyable, Xsum {
     self.m_sacc
   }
 
-  mutating func addList(_ vec: [Double]) {
+  public mutating func addList(_ vec: [Double]) {
     var offset = 0
     var n = vec.count
 
@@ -44,7 +44,7 @@ public struct XsumSmall: ~Copyable, Xsum {
     }
   }
 
-  mutating func add(_ value: Double) {
+  public mutating func add(_ value: Double) {
     self.m_sacc.incrementWhenValueAdded(value)
     if self.m_sacc.m_addsUntilPropagate == 0 {
       let _ = self.m_sacc.carryPropagate()
@@ -53,7 +53,7 @@ public struct XsumSmall: ~Copyable, Xsum {
     self.m_sacc.m_addsUntilPropagate -= 1
   }
 
-  mutating func sum() -> Double {
+  public mutating func sum() -> Double {
     // See if we have a NaN from one of the numbers being a NaN, in
     // which case we return the NaN with largest payload, or an infinite
     // result (+Inf, -Inf, or a NaN if both +Inf and -Inf occurred).
@@ -285,7 +285,7 @@ public struct XsumSmall: ~Copyable, Xsum {
     return Double(bitPattern: UInt64(bitPattern: intv))
   }
 
-  mutating func clear() {
+  public mutating func clear() {
     self = .init()
   }
 }

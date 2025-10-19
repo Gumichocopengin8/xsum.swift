@@ -13,13 +13,13 @@ enum XsumKind: ~Copyable {
 ///
 /// If the size if less than or equal to 1,000, use XsumSmall, otherwise, use XsumLarge
 public struct XsumAuto: ~Copyable, Xsum {
-  var m_xsum: XsumKind
+  private var m_xsum: XsumKind
 
-  init() {
+  public init() {
     self.m_xsum = XsumKind.small(XsumSmall())
   }
 
-  mutating func addList(_ vec: [Double]) {
+  public mutating func addList(_ vec: [Double]) {
     var old = XsumKind.empty
     swap(&old, &self.m_xsum)
 
@@ -36,7 +36,7 @@ public struct XsumAuto: ~Copyable, Xsum {
     }
   }
 
-  mutating func add(_ value: Double) {
+  public mutating func add(_ value: Double) {
     var old = XsumKind.empty
     swap(&old, &self.m_xsum)
 
@@ -53,7 +53,7 @@ public struct XsumAuto: ~Copyable, Xsum {
     }
   }
 
-  mutating func sum() -> Double {
+  public mutating func sum() -> Double {
     var old = XsumKind.empty
     swap(&old, &self.m_xsum)
 
@@ -71,11 +71,11 @@ public struct XsumAuto: ~Copyable, Xsum {
     }
   }
 
-  mutating func clear() {
+  public mutating func clear() {
     self = .init()
   }
 
-  mutating func transformToLarge() {
+  private mutating func transformToLarge() {
     let should_transform =
       switch self.m_xsum {
       case .small(let xsmall):

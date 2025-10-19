@@ -1,18 +1,18 @@
 /// XsumLarge is efficient if vector or array size is more 1,000
 public struct XsumLarge: ~Copyable, Xsum {
-  var m_lacc: LargeAccumulator
+  private var m_lacc: LargeAccumulator
 
-  init() {
+  public init() {
     self.m_lacc = LargeAccumulator()
   }
 
-  mutating func addList(_ vec: [Double]) {
+  public mutating func addList(_ vec: [Double]) {
     for value in vec {
       self.add(value)
     }
   }
 
-  mutating func add(_ value: Double) {
+  public mutating func add(_ value: Double) {
     // increment
     self.m_lacc.m_sacc.incrementWhenValueAdded(value)
 
@@ -39,13 +39,13 @@ public struct XsumLarge: ~Copyable, Xsum {
     }
   }
 
-  mutating func sum() -> Double {
+  public mutating func sum() -> Double {
     self.m_lacc.transferToSmall()
     var xsum_smal = XsumSmall(smallAccumulator: self.m_lacc.m_sacc)
     return xsum_smal.sum()
   }
 
-  mutating func clear() {
+  public mutating func clear() {
     self = .init()
   }
 
