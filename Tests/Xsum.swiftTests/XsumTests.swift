@@ -1,6 +1,6 @@
 import Testing
 
-@testable import xsum
+@testable import Xsum
 
 @Suite("Xsum tests") struct XsumTests {
     private func isValid(actual: Double, expected: Double) -> Bool {
