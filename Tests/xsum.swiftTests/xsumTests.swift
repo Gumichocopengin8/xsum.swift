@@ -80,8 +80,8 @@ import Testing
         xsumVariant.clear()
         #expect(isValid(actual: xsumVariant.sum(), expected: -0.0))
 
-        // // XsumExt
-        // #expect(isValid(actual: vec.xsum(), expected: expected))
+        // Xsum Extension
+        #expect(isValid(actual: vec.xsum(), expected: expected))
     }
 
     @Test
