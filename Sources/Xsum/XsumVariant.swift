@@ -8,56 +8,56 @@
 /// If you already know the input size in advance, you can directly select the
 /// most suitable xsum variant, avoiding unnecessary overhead.
 public enum XsumVariant: ~Copyable, Xsum {
-  case small(XsumSmall)
-  case large(XsumLarge)
+    case small(XsumSmall)
+    case large(XsumLarge)
 
-  public init() {
-    self = .small(XsumSmall())
-  }
-
-  public mutating func addList(_ vec: [Double]) {
-    switch self {
-    case .small(var xsumSmall):
-      xsumSmall.addList(vec)
-      self = .small(xsumSmall)
-    case .large(var xsumLarge):
-      xsumLarge.addList(vec)
-      self = .large(xsumLarge)
+    public init() {
+        self = .small(XsumSmall())
     }
-  }
 
-  public mutating func add(_ value: Double) {
-    switch self {
-    case .small(var xsumSmall):
-      xsumSmall.add(value)
-      self = .small(xsumSmall)
-    case .large(var xsumLarge):
-      xsumLarge.add(value)
-      self = .large(xsumLarge)
+    public mutating func addList(_ vec: [Double]) {
+        switch self {
+        case .small(var xsumSmall):
+            xsumSmall.addList(vec)
+            self = .small(xsumSmall)
+        case .large(var xsumLarge):
+            xsumLarge.addList(vec)
+            self = .large(xsumLarge)
+        }
     }
-  }
 
-  public mutating func sum() -> Double {
-    switch self {
-    case .small(var xsumSmall):
-      let result = xsumSmall.sum()
-      self = .small(xsumSmall)
-      return result
-    case .large(var xsumLarge):
-      let result = xsumLarge.sum()
-      self = .large(xsumLarge)
-      return result
+    public mutating func add(_ value: Double) {
+        switch self {
+        case .small(var xsumSmall):
+            xsumSmall.add(value)
+            self = .small(xsumSmall)
+        case .large(var xsumLarge):
+            xsumLarge.add(value)
+            self = .large(xsumLarge)
+        }
     }
-  }
 
-  public mutating func clear() {
-    switch self {
-    case .small(var xsumSmall):
-      xsumSmall.clear()
-      self = .small(xsumSmall)
-    case .large(var xsumLarge):
-      xsumLarge.clear()
-      self = .large(xsumLarge)
+    public mutating func sum() -> Double {
+        switch self {
+        case .small(var xsumSmall):
+            let result = xsumSmall.sum()
+            self = .small(xsumSmall)
+            return result
+        case .large(var xsumLarge):
+            let result = xsumLarge.sum()
+            self = .large(xsumLarge)
+            return result
+        }
     }
-  }
+
+    public mutating func clear() {
+        switch self {
+        case .small(var xsumSmall):
+            xsumSmall.clear()
+            self = .small(xsumSmall)
+        case .large(var xsumLarge):
+            xsumLarge.clear()
+            self = .large(xsumLarge)
+        }
+    }
 }
