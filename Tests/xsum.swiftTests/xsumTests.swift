@@ -56,6 +56,30 @@ import Testing
         xsumAuto.clear()
         #expect(isValid(actual: xsumAuto.sum(), expected: -0.0))
 
+        // XsumVariant
+        var xsumVariant =
+            if vec.count > 1 {
+                XsumVariant.large(XsumLarge())
+            } else {
+                XsumVariant.small(XsumSmall())
+            }
+        xsumVariant.add_list(vec: vec)
+        #expect(isValid(actual: xsumVariant.sum(), expected: expected))
+
+        xsumVariant =
+            if vec.count <= 1 {
+                XsumVariant.large(XsumLarge())
+            } else {
+                XsumVariant.small(XsumSmall())
+            }
+        for val in vec {
+            xsumVariant.add(value: val)
+        }
+        #expect(isValid(actual: xsumVariant.sum(), expected: expected))
+
+        xsumVariant.clear()
+        #expect(isValid(actual: xsumVariant.sum(), expected: -0.0))
+
         // // XsumExt
         // #expect(isValid(actual: vec.xsum(), expected: expected))
     }
