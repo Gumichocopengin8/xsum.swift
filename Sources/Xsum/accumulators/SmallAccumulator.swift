@@ -151,7 +151,7 @@ struct SmallAccumulator: ~Copyable {
                 // previous Inf was opposite sign
                 var fltv: Double = Double(bitPattern: UInt64(bitPattern: ivalue))
                 fltv -= fltv  // result will be a NaN
-                self.m_inf = Int64(fltv.bitPattern)
+                self.m_inf = Int64(bitPattern: fltv.bitPattern)
             }
         } else {
             // NaN
