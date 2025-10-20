@@ -1,4 +1,4 @@
-/// XsumSmall is efficient if vector or array size is less than or equal to 1,000
+/// XsumSmall is efficient when array size is less than or equal to 1,000
 public struct XsumSmall: ~Copyable, Xsum {
     private var m_sacc: SmallAccumulator
 
@@ -25,16 +25,16 @@ public struct XsumSmall: ~Copyable, Xsum {
         self.m_sacc
     }
 
-    public mutating func addList(_ vec: [Double]) {
+    public mutating func addList(_ arr: [Double]) {
         var offset = 0
-        var n = vec.count
+        var n = arr.count
 
         while 0 < n {
             if self.m_sacc.m_addsUntilPropagate == 0 {
                 let _ = self.m_sacc.carryPropagate()
             }
             let m = min(n, Int(self.m_sacc.m_addsUntilPropagate))
-            for value in vec[offset..<offset + m] {
+            for value in arr[offset..<offset + m] {
                 self.m_sacc.incrementWhenValueAdded(value)
                 self.m_sacc.add1NoCarry(value)
             }

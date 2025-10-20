@@ -7,7 +7,7 @@ enum XsumKind: ~Copyable {
     case large(XsumLarge)
 }
 
-/// XsumAuto is efficient if vector or array size is unknown
+/// XsumAuto is efficient when array size is unknown
 ///
 /// It automatically select either XsumSmall or XsumLarge based on the number of added value
 ///
@@ -19,17 +19,17 @@ public struct XsumAuto: ~Copyable, Xsum {
         self.m_xsum = XsumKind.small(XsumSmall())
     }
 
-    public mutating func addList(_ vec: [Double]) {
+    public mutating func addList(_ arr: [Double]) {
         var old = XsumKind.empty
         swap(&old, &self.m_xsum)
 
         switch old {
         case .small(var xsmall):
-            xsmall.addList(vec)
+            xsmall.addList(arr)
             self.m_xsum = .small(xsmall)
             self.transformToLarge()
         case .large(var xlarge):
-            xlarge.addList(vec)
+            xlarge.addList(arr)
             self.m_xsum = .large(xlarge)
         case .empty:
             fatalError("Empty case should never occur")

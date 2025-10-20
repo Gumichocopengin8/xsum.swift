@@ -13,14 +13,14 @@ import Testing
         return false
     }
 
-    func isSameValue(_ vec: [Double], _ expected: Double) {
+    func isSameValue(_ arr: [Double], _ expected: Double) {
         // XsumSmall
         var xsumSmall = XsumSmall()
-        xsumSmall.addList(vec)
+        xsumSmall.addList(arr)
         #expect(isValid(actual: xsumSmall.sum(), expected: expected))
 
         xsumSmall = XsumSmall()
-        for val in vec {
+        for val in arr {
             xsumSmall.add(val)
         }
         #expect(isValid(actual: xsumSmall.sum(), expected: expected))
@@ -30,58 +30,52 @@ import Testing
 
         // XsumLarge
         var xsumLarge = XsumLarge()
-        xsumLarge.addList(vec)
-        #expect(isValid(actual: xsumLarge.sum(), expected: expected))
-
-        xsumLarge = XsumLarge()
-        for val in vec {
-            xsumLarge.add(val)
-        }
+        xsumLarge.addList(arr)
         #expect(isValid(actual: xsumLarge.sum(), expected: expected))
 
         xsumLarge.clear()
         #expect(isValid(actual: xsumLarge.sum(), expected: -0.0))
 
+        for val in arr {
+            xsumLarge.add(val)
+        }
+        #expect(isValid(actual: xsumLarge.sum(), expected: expected))
+
         // XsumAuto
         var xsumAuto = XsumAuto()
-        xsumAuto.addList(vec)
-        #expect(isValid(actual: xsumAuto.sum(), expected: expected))
-
-        xsumAuto = XsumAuto()
-        for val in vec {
-            xsumAuto.add(val)
-        }
+        xsumAuto.addList(arr)
         #expect(isValid(actual: xsumAuto.sum(), expected: expected))
 
         xsumAuto.clear()
         #expect(isValid(actual: xsumAuto.sum(), expected: -0.0))
 
+        for val in arr {
+            xsumAuto.add(val)
+        }
+        #expect(isValid(actual: xsumAuto.sum(), expected: expected))
+
         // XsumVariant
         var xsumVariant =
-            if vec.count > 1 {
+            if arr.count <= 2 {
                 XsumVariant.large(XsumLarge())
-            } else {
+            } else if arr.count <= 4 {
                 XsumVariant.small(XsumSmall())
-            }
-        xsumVariant.addList(vec)
-        #expect(isValid(actual: xsumVariant.sum(), expected: expected))
-
-        xsumVariant =
-            if vec.count <= 1 {
-                XsumVariant.large(XsumLarge())
             } else {
-                XsumVariant.small(XsumSmall())
+                XsumVariant.auto(XsumAuto())
             }
-        for val in vec {
-            xsumVariant.add(val)
-        }
+        xsumVariant.addList(arr)
         #expect(isValid(actual: xsumVariant.sum(), expected: expected))
 
         xsumVariant.clear()
         #expect(isValid(actual: xsumVariant.sum(), expected: -0.0))
 
+        for val in arr {
+            xsumVariant.add(val)
+        }
+        #expect(isValid(actual: xsumVariant.sum(), expected: expected))
+
         // Xsum Extension
-        #expect(isValid(actual: vec.xsum(), expected: expected))
+        #expect(isValid(actual: arr.xsum(), expected: expected))
     }
 
     @Test
@@ -290,5 +284,18 @@ import Testing
         isSameValue([-0.0, -0.0], -0.0)
         isSameValue([-0.0, 0.0], 0.0)
         isSameValue([0.0], 0.0)
+    }
+
+    @Test
+    func largeSizedArray() {
+        isSameValue(Array(repeating: 0.1, count: 1000), 100)
+        isSameValue(Array(repeating: 0.1, count: 2000), 200)
+        isSameValue(Array(repeating: 1e308, count: 1000), Double.infinity)
+        isSameValue(Array(repeating: -1e308, count: 1000), -Double.infinity)
+        isSameValue(Array(repeating: 1e-308, count: 2000), 1.9999999999999997e-305)
+        isSameValue(Array(repeating: Double.nan, count: 2000), Double.nan)
+        isSameValue(Array(repeating: Double.infinity, count: 2000), Double.infinity)
+        isSameValue(Array(repeating: -Double.infinity, count: 2000), -Double.infinity)
+        isSameValue(Array(repeating: -0.0, count: 2000), -0.0)
     }
 }

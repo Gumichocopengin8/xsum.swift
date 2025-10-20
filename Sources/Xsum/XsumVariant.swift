@@ -10,19 +10,23 @@
 public enum XsumVariant: ~Copyable, Xsum {
     case small(XsumSmall)
     case large(XsumLarge)
+    case auto(XsumAuto)
 
     public init() {
         self = .small(XsumSmall())
     }
 
-    public mutating func addList(_ vec: [Double]) {
+    public mutating func addList(_ arr: [Double]) {
         switch self {
         case .small(var xsumSmall):
-            xsumSmall.addList(vec)
+            xsumSmall.addList(arr)
             self = .small(xsumSmall)
         case .large(var xsumLarge):
-            xsumLarge.addList(vec)
+            xsumLarge.addList(arr)
             self = .large(xsumLarge)
+        case .auto(var xsumAuto):
+            xsumAuto.addList(arr)
+            self = .auto(xsumAuto)
         }
     }
 
@@ -34,6 +38,9 @@ public enum XsumVariant: ~Copyable, Xsum {
         case .large(var xsumLarge):
             xsumLarge.add(value)
             self = .large(xsumLarge)
+        case .auto(var xsumAuto):
+            xsumAuto.add(value)
+            self = .auto(xsumAuto)
         }
     }
 
@@ -47,6 +54,10 @@ public enum XsumVariant: ~Copyable, Xsum {
             let result = xsumLarge.sum()
             self = .large(xsumLarge)
             return result
+        case .auto(var xsumAuto):
+            let result = xsumAuto.sum()
+            self = .auto(xsumAuto)
+            return result
         }
     }
 
@@ -58,6 +69,9 @@ public enum XsumVariant: ~Copyable, Xsum {
         case .large(var xsumLarge):
             xsumLarge.clear()
             self = .large(xsumLarge)
+        case .auto(var xsumAuto):
+            xsumAuto.clear()
+            self = .auto(xsumAuto)
         }
     }
 }
