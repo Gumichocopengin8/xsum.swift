@@ -1,0 +1,32 @@
+name: Swift CI
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+
+jobs:
+  swift-ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install Swift
+        # https://www.swift.org/install/linux/
+        run: |
+          curl -O https://download.swift.org/swiftly/linux/swiftly-$(uname -m).tar.gz && \
+          tar zxf swiftly-$(uname -m).tar.gz && \
+          ./swiftly init --quiet-shell-followup && \
+          . "${SWIFTLY_HOME_DIR:-$HOME/.local/share/swiftly}/env.sh" && \
+          hash -r
+      - name: Output Swift version
+        run: swift --version
+      - name: Build Debug
+        run: swift build -c debug --verbose
+      - name: Run tests Debug
+        run: swift test -c debug --verbose
+      - name: Build Release
+        run: swift build -c release --verbose
+      - name: Run tests Release
+        run: swift test -c release --verbose
