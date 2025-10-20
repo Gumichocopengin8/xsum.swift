@@ -15,20 +15,13 @@ struct SmallAccumulator: ~Copyable {
         self.m_hasPosNumber = false
     }
 
-    init(
-        chunk: [Int64],
-        addsUntilPropagate: Int64,
-        inf: Int64,
-        nan: Int64,
-        sizeCount: UInt64,
-        hasPosNumber: Bool,
-    ) {
-        self.m_chunk = chunk
-        self.m_addsUntilPropagate = addsUntilPropagate
-        self.m_inf = inf
-        self.m_nan = nan
-        self.m_sizeCount = sizeCount
-        self.m_hasPosNumber = hasPosNumber
+    init(smallAccumulator: borrowing SmallAccumulator) {
+        self.m_chunk = smallAccumulator.m_chunk
+        self.m_addsUntilPropagate = smallAccumulator.m_addsUntilPropagate
+        self.m_inf = smallAccumulator.m_inf
+        self.m_nan = smallAccumulator.m_nan
+        self.m_sizeCount = smallAccumulator.m_sizeCount
+        self.m_hasPosNumber = smallAccumulator.m_hasPosNumber
     }
 
     mutating func carryPropagate() -> Int {
