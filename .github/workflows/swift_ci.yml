@@ -7,12 +7,12 @@ on:
     branches: ['main']
 
 jobs:
-  swift-ci:
+  swift-latest:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v5
-      - name: Install Swift
+      - name: Install Latest Swift
         # https://www.swift.org/install/linux/
         run: |
           curl -O https://download.swift.org/swiftly/linux/swiftly-$(uname -m).tar.gz && \
@@ -20,13 +20,40 @@ jobs:
           ./swiftly init --quiet-shell-followup && \
           . "${SWIFTLY_HOME_DIR:-$HOME/.local/share/swiftly}/env.sh" && \
           hash -r
-      - name: Output Swift version
+      - name: Output Swift Version
         run: swift --version
       - name: Build Debug
         run: swift build -c debug --verbose
-      - name: Run tests Debug
+      - name: Run Tests Debug
         run: swift test -c debug --verbose
       - name: Build Release
         run: swift build -c release --verbose
-      - name: Run tests Release
+      - name: Run Tests Release
+        run: swift test -c release --verbose
+
+  swift-5_10_1:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install Swift 5.10.1
+        # https://www.swift.org/install/linux/
+        # https://github.com/swiftlang/swiftly
+        run: |
+          curl -O https://download.swift.org/swiftly/linux/swiftly-$(uname -m).tar.gz && \
+          tar zxf swiftly-$(uname -m).tar.gz && \
+          ./swiftly init --quiet-shell-followup && \
+          . "${SWIFTLY_HOME_DIR:-$HOME/.local/share/swiftly}/env.sh" && \
+          hash -r
+          swiftly install 5.10.1
+          swiftly 5.10.1
+      - name: Output Swift Version
+        run: swift --version
+      - name: Build Debug
+        run: swift build -c debug --verbose
+      - name: Run Tests Debug
+        run: swift test -c debug --verbose
+      - name: Build Release
+        run: swift build -c release --verbose
+      - name: Run Tests Release
         run: swift test -c release --verbose
