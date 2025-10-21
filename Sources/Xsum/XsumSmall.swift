@@ -7,14 +7,7 @@ public struct XsumSmall: ~Copyable, Xsum {
     }
 
     init(smallAccumulator: borrowing SmallAccumulator) {
-        self.m_sacc = SmallAccumulator(
-            chunk: smallAccumulator.m_chunk,
-            addsUntilPropagate: smallAccumulator.m_addsUntilPropagate,
-            inf: smallAccumulator.m_inf,
-            nan: smallAccumulator.m_nan,
-            sizeCount: smallAccumulator.m_sizeCount,
-            hasPosNumber: smallAccumulator.m_hasPosNumber
-        )
+        self.m_sacc = SmallAccumulator(smallAccumulator: smallAccumulator)
     }
 
     func getSizeCount() -> UInt64 {
