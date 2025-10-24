@@ -7,7 +7,7 @@ on:
     branches: ['main']
 
 jobs:
-  swift-ci:
+  swift-latest:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,13 +20,13 @@ jobs:
           ./swiftly init --quiet-shell-followup && \
           . "${SWIFTLY_HOME_DIR:-$HOME/.local/share/swiftly}/env.sh" && \
           hash -r
-      - name: Output Swift version
+      - name: Output Swift Version
         run: swift --version
       - name: Build Debug
         run: swift build -c debug --verbose
-      - name: Run tests Debug
+      - name: Test Debug
         run: swift test -c debug --verbose
       - name: Build Release
         run: swift build -c release --verbose
-      - name: Run tests Release
+      - name: Test Release
         run: swift test -c release --verbose

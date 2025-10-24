@@ -152,12 +152,7 @@ public struct XsumSmall: ~Copyable, Xsum {
             more -= Int32(XSUM_LOW_MANTISSA_BITS)
             ivalue += lower << more
             j -= 1
-            lower =
-                if j < 0 {
-                    0
-                } else {
-                    self.m_sacc.m_chunk[j]
-                }
+            lower = (j < 0) ? 0 : self.m_sacc.m_chunk[j]
         }
         ivalue += lower >> (XSUM_LOW_MANTISSA_BITS - Int64(more))
         lower &= (1 << (XSUM_LOW_MANTISSA_BITS - Int64(more))) - 1
@@ -173,7 +168,7 @@ public struct XsumSmall: ~Copyable, Xsum {
         // code goes to done_rounding if it finds that just discarding lower
         // order bits is correct, and to round_away_from_zero if instead the
         // magnitude should be increased by one in the lowest mantissa bit.
-        var should_round_away_from_zero = false
+        var shouldRoundAwayFromZero = false
         if 0 <= ivalue {
             // number is positive, lower bits are added to magnitude
             intv = 0  // positive sign
@@ -182,13 +177,13 @@ public struct XsumSmall: ~Copyable, Xsum {
                 // extra bits are 0x
                 // TODO(warning): this is not required,
                 // but removing the branch would change the logic
-                should_round_away_from_zero = false
+                shouldRoundAwayFromZero = false
             } else if (ivalue & 1) != 0 {
                 // extra bits are 11
-                should_round_away_from_zero = true
+                shouldRoundAwayFromZero = true
             } else if (ivalue & 4) != 0 {
                 // low bit is 1 (odd), extra bits are 10
-                should_round_away_from_zero = true
+                shouldRoundAwayFromZero = true
             } else {
                 if lower == 0 {
                     // see if any lower bits are non-zero
@@ -202,7 +197,7 @@ public struct XsumSmall: ~Copyable, Xsum {
                 }
                 if lower != 0 {
                     // low bit 0 (even), extra bits 10, non-zero lower bits
-                    should_round_away_from_zero = true
+                    shouldRoundAwayFromZero = true
                 }
             }
         } else {
@@ -228,7 +223,7 @@ public struct XsumSmall: ~Copyable, Xsum {
 
             if (ivalue & 3) == 3 {
                 // extra bits are 11
-                should_round_away_from_zero = true
+                shouldRoundAwayFromZero = true
             }
 
             if lower == 0 {
@@ -244,11 +239,11 @@ public struct XsumSmall: ~Copyable, Xsum {
 
             if lower == 0 {
                 // low bit 1 (odd), extra bits are 10, lower bits are all 0
-                should_round_away_from_zero = true
+                shouldRoundAwayFromZero = true
             }
         }
 
-        if should_round_away_from_zero {
+        if shouldRoundAwayFromZero {
             // Round away from zero, then check for carry having propagated out the
             // top, and shift if so.
             ivalue += 4  // add 1 to low-order mantissa bit
